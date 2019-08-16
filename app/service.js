@@ -67,12 +67,12 @@ module.exports = class Service {
        return result
     }
 
-    static async convertToDae(data) {
+    static async convertToB3dm(data) {
         let result = []
         for (let i = 0; i < data.length; i++) {
             const element = data[i];
             mkdirp.sync(element.path.replace('public/dae','public/b3dm'))
-            await generateJSON(element.x,element.y,element.file,element.path)
+            await Service.generateJSON(element.x,element.y,element.file,element.path)
         }
         return result
      }
