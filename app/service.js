@@ -13,4 +13,27 @@ module.exports = class Service {
         json.output.path = output
         fs.writeFileSync('public/ready.json', JSON.stringify(json), 'utf-8')
     }
+
+    static async summaryDaeFile(dir) {
+        let result = []
+        fs.readdirSync(dir).forEach((filename) => {
+            var path = dir + "/" + filename
+            if (filename.toLocaleLowerCase().includes('dae')) {
+                result.push(path)
+            } else {
+                var stat = fs.statSync(path)
+                if (stat && stat.isDirectory()) {
+                    walk(path)
+                }
+            }
+        })
+        return result
+    }
+
+
+
+
+
+
+
 }
