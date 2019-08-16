@@ -7,6 +7,7 @@ module.exports = class Controller {
        result = await Service.generateDaeJson(result)
        result = await Service.addLongitudeLatitude(result)
        result = await Service.convertToB3dm(result)
+       result = await Service.generateSummaryTilset()
        ctx.body = result
     }
 }
