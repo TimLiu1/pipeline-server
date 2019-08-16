@@ -1,0 +1,1 @@
+ ../Release/scene2tiles.exe --task=D:\\tim\\pipeline-server\\public\\ready.json
