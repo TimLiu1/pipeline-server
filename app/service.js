@@ -2,6 +2,7 @@ let Model = require('../model/model');
 const fs = require('fs')
 const path = require('path');
 const mkdirp = require('mkdirp');
+const exec = require('child_process').exec; 
 
 module.exports = class Service {
     static async findOneModel() {
@@ -46,10 +47,11 @@ module.exports = class Service {
 
 
     static async generateJSON(longitude, latitude, input, output, json) {
+        console.log("output",output)
         json = json || require('../public/convert.json')
         json.inputs[0]['srs'] = `ENU:${latitude},${longitude}`
-        json.inputs[0]['file'] = input
-        json.output.path = output
+        json.inputs[0]['file'] = './'+input
+        json.output.path =  './'+output
         fs.writeFileSync('public/ready.json', JSON.stringify(json), 'utf-8')
     }
 
@@ -70,15 +72,27 @@ module.exports = class Service {
     static async convertToB3dm(data) {
         let result = []
         for (let i = 0; i < data.length; i++) {
+            console.log('processing: ',i)
             const element = data[i];
             mkdirp.sync(element.path.replace('public/dae', 'public/b3dm'))
-            await Service.generateJSON(element.x, element.y, element.file, element.path)
+            await Service.generateJSON(element.x, element.y, element.file,element.path.replace('public/dae', 'public/b3dm'))
+             await Service.b3dmToDae()
+            
         }
         return result
     }
 
     static async b3dmToDae() {
-
+      return new Promise(function(resolve,reject){
+        var cmdStr = 'bash bash.sh';
+        exec(cmdStr, function (err, stdout, stderr) {
+            if (err) {
+                reject(err)
+            } else {
+                resolve()
+            }
+        });
+      })
     }
 
     static async generateSummaryTilset() {
@@ -108,7 +122,7 @@ module.exports = class Service {
                 "children": []
             }
         }
-        let data = await Service.summaryJsonFile('public/dae')
+        let data = await Service.summaryJsonFile('public/b3dm')
         for (let i = 0; i < data.length; i++) {
             const element = data[i];
             let detail = {
