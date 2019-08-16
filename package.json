@@ -1,0 +1,16 @@
+{
+  "name": "dae_project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "tim",
+  "license": "ISC",
+  "dependencies": {
+    "config": "^3.2.2",
+    "koa": "^2.7.0",
+    "mongoose": "^5.6.9"
+  }
+}

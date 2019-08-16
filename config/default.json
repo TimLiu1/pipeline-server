@@ -1,0 +1,14 @@
+{
+    "MONGODB": {
+        "host": "101.132.160.36:27017,47.100.125.118:27017,47.100.125.118:27018",
+        "port": "27017",
+        "database": "cesium",
+        "options": {
+            "user": "cesium",
+            "pass": "1qaz2wsx",
+            "poolSize": 20,
+            "replicaSet":"rs1",
+            "useNewUrlParser": true 
+        }
+    }
+}
