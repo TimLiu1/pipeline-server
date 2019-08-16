@@ -1,6 +1,7 @@
 let Model = require('../model/model');
 const fs = require('fs')
-const path = require('path')
+const path = require('path');
+const mkdirp = require('mkdirp');
 
 module.exports = class Service {
     static async findOneModel() {
@@ -10,7 +11,8 @@ module.exports = class Service {
         let result = []
         for (let i = 0; i < data.length; i++) {
             const element = data[i];
-            let model = await Model.findOne({relationName:element.name})
+            let relationName = new RegExp(element.name)
+            let model = await Model.findOne({relationName})
             if(model){
                 element.x = model.x
                 element.y = model.y
@@ -57,11 +59,21 @@ module.exports = class Service {
            let detail  = {
                daeName:path.basename(e),
                name:path.basename(e).replace('.dae',''),
-               path:e
+               path:path.dirname(e)
            }
            result.push(detail)
        })
        return result
     }
+
+    static async convertToDae(data) {
+        let result = []
+
+        for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            mkdirp.sync(element.path.replace('public/dae','public/b3dm'))
+        }
+        return result
+     }
 
 }
