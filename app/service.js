@@ -59,8 +59,8 @@ module.exports = class Service {
            let detail  = {
                daeName:path.basename(e),
                name:path.basename(e).replace('.dae',''),
-               path:path.dirname(e)
-               file:path
+               path:path.dirname(e),
+               file:e
            }
            result.push(detail)
        })
@@ -69,12 +69,16 @@ module.exports = class Service {
 
     static async convertToDae(data) {
         let result = []
-
         for (let i = 0; i < data.length; i++) {
             const element = data[i];
             mkdirp.sync(element.path.replace('public/dae','public/b3dm'))
+            await generateJSON(element.x,element.y,element.file,element.path)
         }
         return result
+     }
+
+     static async b3dmToDae() {
+         
      }
 
 }
