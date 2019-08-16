@@ -2,6 +2,7 @@ const Service = require('./service')
 
 module.exports = class Controller {
     static async convertModel(ctx) {
-        ctx.body = await Service.findOneModel();
+       let model = await Service.findOneModel();
+       Service.generateJSON(model.x,model.y)
     }
 }
