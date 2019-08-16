@@ -1,10 +1,12 @@
 const Service = require('./service')
-
+const path = require('path')
 module.exports = class Controller {
     static async convertModel(ctx) {
        let model = await Service.findOneModel();
        Service.generateJSON(model.x,model.y)
-       let file = Service.summaryDaeFile('public/dae')
-       ctx.body = file
+       let result = await Service.summaryDaeFile('public/dae')
+       result = await Service.generateDaeJson(result)
+       result = await Service.addLongitudeLatitude(result)
+       ctx.body = result
     }
 }

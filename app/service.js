@@ -1,26 +1,47 @@
-let model = require('../model/model');
+let Model = require('../model/model');
 const fs = require('fs')
+const path = require('path')
 
 module.exports = class Service {
     static async findOneModel() {
-        return await model.findOne({})
+        return await Model.findOne({})
+    }
+    static async addLongitudeLatitude(data) {
+        let result = []
+        for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            let model = await Model.findOne({relationName:element.name})
+            if(model){
+                element.x = model.x
+                element.y = model.y
+            }
+            result.push(element)
+        }
+       return result
     }
 
     static async summaryDaeFile(dir) {
-        let result = []
-        fs.readdirSync(dir).forEach((filename) => {
-            var path = dir + "/" + filename
-            if (filename.toLocaleLowerCase().includes('dae')) {
-                result.push(path)
-            } else {
-                var stat = fs.statSync(path)
-                if (stat && stat.isDirectory()) {
-                    walk(path)
+        let result = [];
+        readdirSync(dir)
+        function readdirSync(dir) {
+            fs.readdirSync(dir).forEach((filename) => {
+                var path = dir + "/" + filename
+                if (filename.toLocaleLowerCase().includes('dae')) {
+                    result.push(path)
+                } else {
+                    if (!filename.includes('DS_Store')) {
+                        var stat = fs.statSync(path)
+                        if (stat && stat.isDirectory()) {
+                            readdirSync(path)
+                        }
+                    }
+
                 }
-            }
-        })
+            })
+        }
         return result
     }
+
 
     static async generateJSON(longitude, latitude, input, output, json) {
         json = json || require('../public/convert.json')
@@ -29,4 +50,18 @@ module.exports = class Service {
         json.output.path = output
         fs.writeFileSync('public/ready.json', JSON.stringify(json), 'utf-8')
     }
+
+    static async generateDaeJson(data) {
+       let result = []
+       data.forEach((e) => {
+           let detail  = {
+               daeName:path.basename(e),
+               name:path.basename(e).replace('.dae',''),
+               path:e
+           }
+           result.push(detail)
+       })
+       return result
+    }
+
 }
