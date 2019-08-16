@@ -60,6 +60,7 @@ module.exports = class Service {
                daeName:path.basename(e),
                name:path.basename(e).replace('.dae',''),
                path:path.dirname(e)
+               file:path
            }
            result.push(detail)
        })
