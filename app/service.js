@@ -2,7 +2,7 @@ let Model = require('../model/model');
 const fs = require('fs')
 const path = require('path');
 const mkdirp = require('mkdirp');
-const exec = require('child_process').exec; 
+const exec = require('child_process').exec;
 
 module.exports = class Service {
     static async findOneModel() {
@@ -45,13 +45,31 @@ module.exports = class Service {
         return result
     }
 
+    static async convertDae(url, name) {
+        let data = fs.readFileSync(url, 'utf-8');
+        let reg = /file.*(?=MAPS)/ig
+        let reg1 = /file.*(?=MAP)/ig
+        let reg2 = /file.*\\|(?=.*\.JPG)/ig
+        if (reg.test(data)) {
+            data = data.replace(reg, "")
+        } else if (reg1.test(data)) {
+            data = data.replace(reg1, "")
+        } else {
+            data = data.replace(reg2, "")
+        }
+        data = data.replace(/(?<=sid="matrix">[\-0-9]+\.[0-9]+ ([\-0-9]+\.[0-9]+ ){2})([\-0-9]+\.[0-9]+)/ig, "0.000000")
+        data = data.replace(/(?<=sid="matrix">[\-0-9]+\.[0-9]+ ([\-0-9]+\.[0-9]+ ){6})([\-0-9]+\.[0-9]+)/ig, "0.000000")
+        fs.writeFileSync(url + name, data, 'utf-8')
+
+    }
+
 
     static async generateJSON(longitude, latitude, input, output, json) {
-        console.log("output",output)
+        console.log("output", output)
         json = json || require('../public/convert.json')
         json.inputs[0]['srs'] = `ENU:${latitude},${longitude}`
-        json.inputs[0]['file'] = './'+input
-        json.output.path =  './'+output
+        json.inputs[0]['file'] = './' + input
+        json.output.path = './' + output
         fs.writeFileSync('public/ready.json', JSON.stringify(json), 'utf-8')
     }
 
@@ -72,27 +90,27 @@ module.exports = class Service {
     static async convertToB3dm(data) {
         let result = []
         for (let i = 0; i < data.length; i++) {
-            console.log('processing: ',i)
+            console.log('processing: ', i)
             const element = data[i];
             mkdirp.sync(element.path.replace('public/dae', 'public/b3dm'))
-            await Service.generateJSON(element.x, element.y, element.file,element.path.replace('public/dae', 'public/b3dm'))
-             await Service.b3dmToDae()
-            
+            await Service.generateJSON(element.x, element.y, element.file, element.path.replace('public/dae', 'public/b3dm'))
+            await Service.b3dmToDae()
+
         }
         return result
     }
 
     static async b3dmToDae() {
-      return new Promise(function(resolve,reject){
-        var cmdStr = 'bash bash.sh';
-        exec(cmdStr, function (err, stdout, stderr) {
-            if (err) {
-                reject(err)
-            } else {
-                resolve()
-            }
-        });
-      })
+        return new Promise(function (resolve, reject) {
+            var cmdStr = 'bash bash.sh';
+            exec(cmdStr, function (err, stdout, stderr) {
+                if (err) {
+                    reject(err)
+                } else {
+                    resolve()
+                }
+            });
+        })
     }
 
     static async generateSummaryTilset() {
