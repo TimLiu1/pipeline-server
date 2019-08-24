@@ -79,8 +79,13 @@ module.exports = class Service {
         console.log("latitude", latitude)
         json = json || require('../public/convert.json')
         json.inputs[0]['srs'] = `ENU:${latitude},${longitude}`
+<<<<<<< HEAD
         json.inputs[0]['file'] = path.join('./', input)
         json.output.path = path.join('./', output)
+=======
+        json.inputs[0]['file'] = path.join('./' , input)
+        json.output.path =  path.join('./' , output)
+>>>>>>> 5d758fe32bc0ff1fd48e82cc297b21da1ca56a4a
         fs.writeFileSync('public/ready.json', JSON.stringify(json), 'utf-8')
     }
 
