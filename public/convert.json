@@ -15,12 +15,12 @@
             "savefilename": true,
             "saveobjectname": true,
             "encodeGBK": false,
-            "simplifyMesh": "before",
+            "simplifyMesh": "none",
             "colorRatio": 1,
             "geotransPlan": true
         }
     ],
-    "minGeometricError": 0.001,
+    "minGeometricError": 0.00001,
     "boxRadius2GeometricError": 1,
     "nextGeometricErrorFactor": 0.25,
     "tileMaxDataSize": 2000000,

@@ -65,12 +65,41 @@ module.exports = class Service {
 
 
     static async generateJSON(longitude, latitude, input, output, json) {
-        console.log("output", output)
+        if (!latitude) {
+            let errresult = {
+                longitude,
+                latitude,
+                input,
+                output,
+                date: new Date()
+            }
+            fs.appendFileSync('../result.json', JSON.stringify(errresult), 'utf-8');
+        }
+        console.log("longitude", longitude)
+        console.log("latitude", latitude)
         json = json || require('../public/convert.json')
         json.inputs[0]['srs'] = `ENU:${latitude},${longitude}`
-        json.inputs[0]['file'] = './' + input
-        json.output.path = './' + output
+        json.inputs[0]['file'] = path.join('./', input)
+        json.output.path = path.join('./', output)
         fs.writeFileSync('public/ready.json', JSON.stringify(json), 'utf-8')
+    }
+
+    
+    static async generateJSONForBatch(longitude, latitude, input, output, json) {
+        if (!latitude) {
+            let errresult = {
+                longitude,
+                latitude,
+                input,
+                output,
+                date: new Date()
+            }
+            fs.appendFileSync('../result.json', JSON.stringify(errresult), 'utf-8');
+        }
+        json.srs = `ENU:${latitude},${longitude}`
+        json.file = path.join('./', input)
+        return json
+        // fs.writeFileSync('public/ready.json', JSON.stringify(json), 'utf-8')
     }
 
     static async generateDaeJson(data) {
@@ -99,6 +128,62 @@ module.exports = class Service {
         }
         return result
     }
+
+
+    static async convertToB3dmBatch(data) {
+        let json = require('../public/convert.json')
+        let  x = JSON.parse(JSON.stringify(json))
+        let temp = []
+        let result = []
+        for (let i = 0; i < data.length; i++) {
+            console.log("start",i)
+            const element = data[i];
+            mkdirp.sync(element.path.replace('public/dae', 'public/b3dm'))
+            let ok ={ file:
+   'public\\dae\\Model_Conversion\\87_col_7\\external\\HPWLKZ_lubanlu509nong10_12hao\\MAX\\HPWLKZ_lubanlu509nong10_12hao.dae',
+  nolight: false,
+  forceDoubleSide: false,
+  customShader: false,
+  textureGeometricErrorFactor: 16,
+  splitPriority: 'space',
+  splitMaxDataSize: 40000000,
+  splitUnit: 'mesh',
+  srs: 'ENU:31.203585,121.472453',
+  srsorigin: '0,0,0',
+  filename: 'test0802',
+  savefilename: true,
+  saveobjectname: true,
+  encodeGBK: false,
+  simplifyMesh: 'none',
+  colorRatio: 1,
+  geotransPlan: true }
+            let detail = await Service.generateJSONForBatch(element.x, element.y, element.file, element.path.replace('public/dae', 'public/b3dm'), ok)
+            temp.push(JSON.parse(JSON.stringify(detail)))
+            // if(!isNaN(element.x)){
+               console.log('i',detail)
+                detail = await Service.generateJSONForBatch(element.x+ 0.000111, element.y+ 0.000111, element.file, element.path.replace('public/dae', 'public/b3dm'), ok)
+               console.log('i',detail)
+                temp.push(detail)
+            // }
+          
+
+
+
+
+            
+
+            
+        }
+            x.inputs = temp
+        console.log("--->",temp.length)
+        x.output.path = path.join('./public/b3dmall')
+        // console.log('xxxx',x)
+        fs.writeFileSync('public/ready.json', JSON.stringify(x), 'utf-8')
+        await Service.b3dmToDae()
+        return result
+    }
+
+
 
     static async b3dmToDae() {
         return new Promise(function (resolve, reject) {
@@ -141,6 +226,7 @@ module.exports = class Service {
             }
         }
         let data = await Service.summaryJsonFile('public/b3dm')
+        console.log(data)
         for (let i = 0; i < data.length; i++) {
             const element = data[i];
             let detail = {
@@ -156,13 +242,13 @@ module.exports = class Service {
                 },
                 "geometricError": 0,
                 "content": {
-                    "uri": element
+                    "uri": element.replace('public/b3dm/', '')
                 }
 
             }
             tileset.root.children.push(detail)
         }
-        fs.writeFileSync('public/dae/tileset.json', JSON.stringify(tileset), 'utf-8')
+        fs.writeFileSync('public/b3dm/tileset.json', JSON.stringify(tileset), 'utf-8')
     }
 
 
@@ -188,6 +274,25 @@ module.exports = class Service {
         }
         return result
     }
+
+
+    static async deleteFile(dir) {
+        let result = [];
+        readdirSync(dir)
+        function readdirSync(dir) {
+            fs.readdirSync(dir).forEach((filename) => {
+                var path = dir + "/" + filename
+                var stat = fs.statSync(path)
+                if (stat && stat.isDirectory()) {
+                    readdirSync(path)
+                } else {
+                    fs.unlinkSync(path)
+                }
+            })
+        }
+        return result
+    }
+
 
 
 

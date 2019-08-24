@@ -8,3 +8,4 @@ module.exports = (app) => {
 
 }
 router.get('/convertModel', Controller.convertModel);
+router.get('/convertModelBatch', Controller.convertModelBatch);
