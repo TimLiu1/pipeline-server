@@ -9,7 +9,7 @@
   "author": "tim",
   "license": "ISC",
   "dependencies": {
-    "config": "^3.2.2",
+    "config": "^3.3.8",
     "koa": "^2.7.0",
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
